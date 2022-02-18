@@ -7,7 +7,9 @@ import androidx.lifecycle.viewModelScope
 import com.compose.instagram.base.BaseViewModel
 import com.compose.instagram.home.data.HomeRepository
 import com.compose.instagram.home.data.IHomeRepository
+import com.compose.instagram.home.domain.model.Publication
 import com.compose.instagram.home.domain.model.Story
+import com.compose.instagram.home.domain.usecase.GetPublicationUseCase
 import com.compose.instagram.home.domain.usecase.GetStoriesUseCase
 import kotlinx.coroutines.launch
 import toothpick.InjectConstructor
@@ -37,11 +39,15 @@ class MainViewModel(application: Application) :
     @Inject
     lateinit var getStoriesUseCase: GetStoriesUseCase
 
+    @Inject
+    lateinit var getPublicationUseCase: GetPublicationUseCase
+
     ///////////////////////////////////////////////////////////////////////////
     // DATA
     ///////////////////////////////////////////////////////////////////////////
 
     private val _stories = MutableLiveData(listOf<Story>())
+    private val _publications = MutableLiveData(listOf<Publication>())
 
     ///////////////////////////////////////////////////////////////////////////
     // LIFECYCLE
@@ -49,6 +55,7 @@ class MainViewModel(application: Application) :
 
     override fun onCreated() {
         getStories()
+        getPublications()
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -58,10 +65,20 @@ class MainViewModel(application: Application) :
     override val stories: LiveData<List<Story>>
         get() = _stories
 
+    override val publications: LiveData<List<Publication>>
+        get() = _publications
+
     override fun getStories() {
         viewModelScope.launch {
             val stories = getStoriesUseCase.execute()
             _stories.postValue(stories)
+        }
+    }
+
+    override fun getPublications() {
+        viewModelScope.launch {
+            val publications = getPublicationUseCase.execute()
+            _publications.postValue(publications)
         }
     }
 

@@ -1,6 +1,7 @@
 package com.compose.instagram.home.presentation.composable
 
 import android.content.res.Configuration
+import androidx.annotation.DrawableRes
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -27,6 +28,10 @@ import com.compose.instagram.ui.theme.InstagramTheme
 import com.compose.instagram.ui.theme.StoryStyle
 import com.compose.instagram.ui.theme.TorchRed
 
+///////////////////////////////////////////////////////////////////////////
+// COMPASABLE
+///////////////////////////////////////////////////////////////////////////
+
 @Composable
 fun StoryItem(
     story: Story,
@@ -39,20 +44,14 @@ fun StoryItem(
             .background(MaterialTheme.colors.background),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Image(
-            painter = painterResource(id = story.picture),
-            contentDescription = "story ${story.userName}",
-            contentScale = ContentScale.Crop,
-            modifier = Modifier
-                .size(60.dp)
-                .clip(CircleShape)                       // clip to the circle shape
-                .border(
-                    if (story.id == 0) 0.dp else 2.dp,
-                    if (story.isRead.not()) TorchRed else Color.Gray,
-                    CircleShape
-                )   // add a border (optional)
-                .clickable { onClickStory(story) }
-        )
+        RoundedImage(
+            picture = story.picture,
+            size = 60f,
+            isRead = story.isRead,
+            showBorder = story.id != 0,
+        ) {
+            // TODO onClick
+        }
         Text(
             text = story.userName,
             color = MaterialTheme.colors.onPrimary,
@@ -63,6 +62,35 @@ fun StoryItem(
         )
     }
 }
+
+@Composable
+fun RoundedImage(
+    modifier: Modifier = Modifier,
+    @DrawableRes picture: Int,
+    isRead: Boolean = true,
+    showBorder: Boolean = true,
+    size: Float,
+    onClick: () -> Unit
+) {
+    Image(
+        painter = painterResource(id = picture),
+        contentDescription = "story",
+        contentScale = ContentScale.Crop,
+        modifier = Modifier
+            .size(size.dp)
+            .clip(CircleShape)                       // clip to the circle shape
+            .border(
+                if (!showBorder) 0.dp else 2.dp,
+                if (!isRead) TorchRed else Color.Gray,
+                CircleShape
+            )   // add a border (optional)
+            .clickable { onClick() }
+    )
+}
+
+///////////////////////////////////////////////////////////////////////////
+// PREVIEW
+///////////////////////////////////////////////////////////////////////////
 
 @Preview(
     showBackground = true,
